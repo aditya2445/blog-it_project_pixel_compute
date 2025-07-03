@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 
 import postsApi from "apis/posts";
-import { PageLoader, PageTitle, Container } from "components/commons";
+import { PageLoader, PageTitle, Container, Button } from "components/commons";
 import List from "components/Posts/List";
 import Logger from "js-logger";
 import { isNil, isEmpty, either } from "ramda";
 
-const Dashboard = () => {
+const Dashboard = ({ history }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const fetchPosts = async () => {
@@ -20,6 +20,14 @@ const Dashboard = () => {
       Logger.error(error);
       setLoading(false);
     }
+  };
+
+  const clickHandler = () => {
+    history.push("post/create");
+  };
+
+  const showPost = slug => {
+    history.push(`/posts/${slug}/show`);
   };
 
   useEffect(() => {
@@ -45,8 +53,15 @@ const Dashboard = () => {
   return (
     <Container className="h-screen w-full">
       <div className="flex flex-col gap-y-8 overflow-y-auto">
-        <PageTitle title="Blog Posts" />
-        <List postList={posts} />
+        <div className="flex items-center justify-between">
+          <PageTitle title="Add new Post" />
+          <Button
+            buttonText="Add Post"
+            className="bg-slate-700"
+            onClick={clickHandler}
+          />
+        </div>
+        <List postList={posts} showPost={showPost} />
       </div>
     </Container>
   );

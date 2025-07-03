@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-if defined?(ActiveRecord::ConnectionAdapters::SQLite3Adapte)
+if defined?(ActiveRecord::ConnectionAdapters::SQLite3Adapter)
   ActiveRecord::ConnectionAdapters::SQLite3Adapter.class_eval do
     alias_method :original_initialize, :initialize
 
