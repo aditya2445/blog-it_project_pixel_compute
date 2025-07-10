@@ -1,7 +1,7 @@
 import React from "react";
 
 import classnames from "classnames";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 
 const TextArea = ({
   label,
@@ -37,15 +37,15 @@ const TextArea = ({
   </div>
 );
 
-TextArea.propTypes = {
-  label: PropTypes.string,
-  value: PropTypes.node,
-  placeholder: PropTypes.string,
-  onChange: PropTypes.func,
-  disabled: PropTypes.bool,
-  required: PropTypes.bool,
-  rows: PropTypes.number,
-  className: PropTypes.string,
-};
+// TextArea.propTypes = {
+//   label: PropTypes.string,
+//   value: PropTypes.node,
+//   placeholder: PropTypes.string,
+//   onChange: PropTypes.func,
+//   disabled: PropTypes.bool,
+//   required: PropTypes.bool,
+//   rows: PropTypes.number,
+//   className: PropTypes.string,
+// };
 
 export default TextArea;

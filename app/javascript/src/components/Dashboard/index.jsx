@@ -44,8 +44,13 @@ const Dashboard = ({ history }) => {
 
   if (either(isNil, isEmpty)(posts)) {
     return (
-      <Container className="mt-10 flex w-full flex-col items-center">
+      <Container className="mt-10 flex w-full justify-between">
         <p className="text-lg font-bold">No posts to show.</p>
+        <Button
+          buttonText="Add Post"
+          className="self-start bg-slate-700"
+          onClick={clickHandler}
+        />
       </Container>
     );
   }

@@ -1,48 +1,97 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import { Input, Button, TextArea } from "components/commons";
-import { Link } from "react-router-dom";
+import categoriesApi from "apis/categories";
+import { Button, Input } from "components/commons";
+import Select from "react-select";
 
 const Form = ({
-  description,
-  type = "create",
   title,
   setTitle,
-  loading,
-  handleSubmit,
+  description,
   setDescription,
-}) => (
-  <form
-    className="mb-4 flex h-[70vh] min-h-fit w-full flex-col justify-between space-y-2 rounded-lg border-2 border-gray-200 p-4"
-    onSubmit={handleSubmit}
-  >
-    <div className="flex flex-col gap-4">
-      <Input
-        label="Title"
-        placeholder="Enter title"
-        value={title}
-        onChange={e => setTitle(e.target.value.slice(0, 50))}
-      />
-      <TextArea
-        label="Description"
-        placeholder="Enter description"
-        rows={4}
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-      />
-    </div>
-    <div className="flex gap-2 self-end">
-      <Link className="border px-4 py-2" to="/dashboard">
-        Cancel
-      </Link>
-      <Button
-        buttonText={type === "create" ? "Create Post" : "Update Post"}
-        className="bg-slate-950"
-        loading={loading}
-        type="submit"
-      />
-    </div>
-  </form>
-);
+  selectedCategoryIds,
+  setSelectedCategoryIds,
+  handleSubmit,
+  loading,
+}) => {
+  const [categories, setCategories] = useState([]);
+  const fetchCategories = async () => {
+    try {
+      const {
+        data: { categories },
+      } = await categoriesApi.fetch();
+      setCategories(categories);
+    } catch (error) {
+      logger.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const categoryOptions = categories.map(category => ({
+    value: category.id,
+    label: category.name,
+  }));
+
+  const selectedOptions = categoryOptions.filter(option =>
+    selectedCategoryIds.includes(option.value)
+  );
+
+  const handleCategoryChange = selectedOptions => {
+    const ids = selectedOptions.map(option => option.value);
+    setSelectedCategoryIds(ids);
+  };
+
+  return (
+    <form className="h-full w-full" onSubmit={handleSubmit}>
+      <div className="flex h-full flex-col justify-between rounded-md border p-6 shadow">
+        <div className="flex flex-col gap-4">
+          <Input
+            label="Title"
+            placeholder="Enter title"
+            value={title}
+            onChange={event => setTitle(event.target.value)}
+          />
+          <div className="flex flex-col">
+            <label className="mb-1 text-sm font-medium text-gray-800">
+              Categories
+            </label>
+            <Select
+              isMulti
+              className="text-sm"
+              classNamePrefix="react-select"
+              options={categoryOptions}
+              value={selectedOptions}
+              onChange={handleCategoryChange}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-800">
+              Description
+            </label>
+            <textarea
+              required
+              className="mt-1 rounded-md border border-gray-300 p-2 text-sm"
+              placeholder="Enter description"
+              rows="5"
+              value={description}
+              onChange={event => setDescription(event.target.value)}
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-4 self-end">
+          <Button
+            buttonText="Cancel"
+            style="secondary"
+            onClick={() => history.back()}
+          />
+          <Button buttonText="Submit" loading={loading} type="submit" />
+        </div>
+      </div>
+    </form>
+  );
+};
 
 export default Form;
