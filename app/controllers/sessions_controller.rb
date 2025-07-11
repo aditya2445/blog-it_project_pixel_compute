@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  skip_before_action :authenticate_user_using_x_auth_token
+  skip_before_action :authenticate_user_using_x_auth_token, only: :create
   def create
     @user = User.find_by!(email: login_params[:email].downcase)
     unless @user.authenticate(login_params[:password])
@@ -14,6 +14,10 @@ class SessionsController < ApplicationController
       email: @user.email,
       authentication_token: @user.authentication_token
     }, status: :ok
+  end
+
+  def destroy
+    @current_user = nil
   end
 
   private

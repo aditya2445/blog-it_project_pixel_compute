@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useRef } from "react";
 
+import { Popover } from "@bigbinary/neetoui";
+import authApi from "apis/auth";
+import { resetAuthTokens } from "apis/axios";
 import { Button } from "components/commons";
-import { Link } from "react-router-dom/cjs/react-router-dom.min";
-import { getFromLocalStorage } from "utils/storage";
+import { getFromLocalStorage, setToLocalStorage } from "utils/storage";
 
 const NavBar = ({ setShow }) => {
   const userName = getFromLocalStorage("authUserName");
+  const loggedUserImageReference = useRef(null);
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+      setToLocalStorage({
+        authToken: null,
+        email: null,
+        userId: null,
+        userName: null,
+      });
+      resetAuthTokens();
+      window.location.href = "/";
+    } catch (error) {
+      logger.error(error);
+    }
+  };
 
   return (
     <div className="flex h-screen w-20 flex-col items-center justify-between border-r-2 p-4 ">
@@ -18,9 +36,30 @@ const NavBar = ({ setShow }) => {
           onClick={() => setShow(prev => !prev)}
         />
       </div>
-      <Link className="flex items-center gap-x-1 rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300 focus:shadow">
-        <span className="block">{userName}</span>
-      </Link>
+      <div className="relative">
+        <img
+          alt="profile"
+          className="h-10 w-10 rounded-full border "
+          ref={loggedUserImageReference}
+          src="https://static.vecteezy.com/system/resources/thumbnails/022/014/184/small/user-icon-member-login-isolated-vector.jpg"
+        />
+        <Popover
+          className="w-auto"
+          position="right"
+          reference={loggedUserImageReference}
+        >
+          <div className="p-2">
+            <div className="cursor-pointer text-center text-lg font-semibold">
+              {userName}
+            </div>
+            <Button
+              buttonText="Logout"
+              className="cursor-pointer. bg-white text-sm text-black hover:text-white"
+              onClick={handleLogout}
+            />
+          </div>
+        </Popover>
+      </div>
     </div>
   );
 };
