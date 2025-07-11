@@ -3,6 +3,7 @@ import Container from "./Container";
 import Input from "./Input";
 import PageLoader from "./PageLoader";
 import PageTitle from "./PageTitle";
+import PrivateRoute from "./PrivateRoute";
 import TextArea from "./TextArea";
 import Toastr from "./Toastr";
 import Tooltip from "./Tooltip";
@@ -13,6 +14,7 @@ export {
   Input,
   PageLoader,
   PageTitle,
+  PrivateRoute,
   Tooltip,
   Toastr,
   TextArea,

@@ -38,7 +38,7 @@ const Signup = ({ history }) => {
         organization_id: selectedOrganization.value,
       });
       setLoading(false);
-      history.push("/dashboard");
+      history.push("/");
     } catch (error) {
       logger.error(error);
       setLoading(false);

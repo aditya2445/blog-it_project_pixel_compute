@@ -1,24 +1,36 @@
 import React from "react";
 
-import Signup from "components/Authentication/Signup";
+import { Login, Signup } from "components/Authentication";
+import { PrivateRoute } from "components/commons";
 import { CreatePost, ShowPost } from "components/Posts";
+import { either, isEmpty, isNil } from "ramda";
 import { Route, Switch, BrowserRouter as Router } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { getFromLocalStorage } from "utils/storage";
 
 import Dashboard from "./components/Dashboard";
 
-const App = () => (
-  <Router>
-    <ToastContainer />
-    <Switch>
-      <Route exact path="/" render={() => <div>Home</div>} />
-      <Route exact path="/about" render={() => <div>About</div>} />
-      <Route exact component={Dashboard} path="/dashboard" />
-      <Route exact component={CreatePost} path="/post/create" />
-      <Route exact component={ShowPost} path="/posts/:slug/show" />
-      <Route exact component={Signup} path="/signup" />
-    </Switch>
-  </Router>
-);
+const App = () => {
+  const authToken = getFromLocalStorage("authToken");
+  const isLoggedIn = !either(isNil, isEmpty)(authToken);
+
+  return (
+    <Router>
+      <ToastContainer />
+      <Switch>
+        <Route exact component={CreatePost} path="/post/create" />
+        <Route exact component={ShowPost} path="/posts/:slug/show" />
+        <Route exact component={Signup} path="/signup" />
+        <Route exact component={Login} path="/login" />
+        <PrivateRoute
+          component={Dashboard}
+          condition={isLoggedIn}
+          path="/"
+          redirectRoute="/login"
+        />
+      </Switch>
+    </Router>
+  );
+};
 
 export default App;
