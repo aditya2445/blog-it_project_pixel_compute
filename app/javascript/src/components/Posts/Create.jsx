@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import postsApi from "apis/posts";
 import { Container, PageTitle } from "components/commons";
 import { useHistory } from "react-router-dom";
+import { getFromLocalStorage } from "utils/storage";
 
 import Form from "./Form";
 
@@ -12,6 +13,7 @@ const Create = () => {
   const [description, setDescription] = useState("");
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [loading, setLoading] = useState(false);
+  const authUserId = getFromLocalStorage("authUserId");
 
   const handleSubmit = async event => {
     event.preventDefault();
@@ -21,6 +23,7 @@ const Create = () => {
         title,
         description,
         category_ids: selectedCategoryIds,
+        user_id: authUserId,
       });
       history.push("/");
     } catch (error) {
