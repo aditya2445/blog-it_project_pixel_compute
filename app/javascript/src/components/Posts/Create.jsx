@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-import postsApi from "apis/posts";
 import { Container, PageTitle } from "components/commons";
+import { useCreatePost } from "hooks/usePostsApi";
 import { useHistory } from "react-router-dom";
 import { getFromLocalStorage } from "utils/storage";
 
@@ -15,22 +15,29 @@ const Create = () => {
   const [loading, setLoading] = useState(false);
   const authUserId = getFromLocalStorage("authUserId");
 
+  const { mutate } = useCreatePost();
+
   const handleSubmit = async event => {
     event.preventDefault();
     setLoading(true);
-    try {
-      await postsApi.create({
+    mutate(
+      {
         title,
         description,
         category_ids: selectedCategoryIds,
         user_id: authUserId,
-      });
-      history.push("/");
-    } catch (error) {
-      logger.error(error);
-    } finally {
-      setLoading(false);
-    }
+      },
+      {
+        onSuccess: () => {
+          setLoading(false);
+          history.push("/dashboard");
+        },
+        onError: error => {
+          setLoading(false);
+          logger.error(error);
+        },
+      }
+    );
   };
 
   return (

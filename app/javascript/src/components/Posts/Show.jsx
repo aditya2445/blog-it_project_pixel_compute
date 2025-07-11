@@ -1,49 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Typography } from "@bigbinary/neetoui";
-import postsApi from "apis/posts";
 import { Container, PageLoader, PageTitle } from "components/commons";
 import Categories from "components/commons/Categories";
-import { useHistory, useParams } from "react-router-dom";
+import { useFetchPostBySlug } from "hooks/usePostsApi";
+import { useParams } from "react-router-dom";
 
 const Show = () => {
-  const [post, setPost] = useState([]);
-  const [pageLoading, setPageLoading] = useState(true);
   const { slug } = useParams();
-  const history = useHistory();
-  const [user, setUser] = useState({});
-  const [categories, setCategories] = useState([]);
+  const { data, isLoading } = useFetchPostBySlug(slug);
+  if (isLoading) {
+    return <PageLoader />;
+  }
+  const { post, user, categories } = data.data;
+
   const isoDate = post.created_at;
   const date = new Date(isoDate);
-
-  const fetchPostDetails = async () => {
-    try {
-      const {
-        data: { post, user, categories },
-      } = await postsApi.show(slug);
-      setPost(post);
-      setUser(user);
-      setCategories(categories);
-      setPageLoading(false);
-    } catch (error) {
-      logger.error(error);
-      history.push("/");
-    }
-  };
 
   const formattedDate = date.toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-
-  useEffect(() => {
-    fetchPostDetails();
-  }, []);
-
-  if (pageLoading) {
-    return <PageLoader />;
-  }
 
   return (
     <Container>

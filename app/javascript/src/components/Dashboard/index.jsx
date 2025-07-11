@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-import postsApi from "apis/posts";
 import { PageLoader, PageTitle, Container, Button } from "components/commons";
 import List from "components/Posts/List";
-import Logger from "js-logger";
+import { useShowPosts } from "hooks/usePostsApi";
 import { isNil, isEmpty, either } from "ramda";
 import useCategoryStore from "stores/categoryStore";
-// import { element } from "prop-types";
 
 const Dashboard = ({ history }) => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { selectedCategories } = useCategoryStore();
-
-  const fetchPosts = async () => {
-    try {
-      const {
-        data: { posts },
-      } = await postsApi.fetch();
-      setPosts(posts);
-      setLoading(false);
-    } catch (error) {
-      Logger.error(error);
-      setLoading(false);
-    }
-  };
-
+  const { data, isLoading } = useShowPosts();
+  const posts = data?.data?.posts;
   const clickHandler = () => {
     history.push("post/create");
   };
@@ -34,11 +18,7 @@ const Dashboard = ({ history }) => {
     history.push(`/posts/${slug}/show`);
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div>
         <PageLoader />

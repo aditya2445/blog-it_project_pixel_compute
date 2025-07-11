@@ -4,46 +4,36 @@ import { Search, Plus } from "@bigbinary/neeto-icons";
 import { Typography, Input, Button, Modal } from "@bigbinary/neetoui";
 import categoriesApi from "apis/categories";
 import classNames from "classnames";
+import { useFetchCategories } from "hooks/useCategoryApi";
 import { isEmpty } from "ramda";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import useCategoryStore from "stores/categoryStore";
 
 const List = ({ show }) => {
-  const [categories, setCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [toggleSearch, setToggleSearch] = useState(false);
   const [searchInput, setSearchInput] = useState("");
-
   const { selectedCategories, toggleCategory } = useCategoryStore();
+  const { data, isLoading } = useFetchCategories();
+  const categories = data?.data?.categories;
+
+  useEffect(() => {
+    if (!isLoading && categories) {
+      setFilteredCategories(categories);
+    }
+  }, [isLoading, categories]);
 
   const handleSelectedCategories = category => {
     toggleCategory(category.name);
   };
-
-  const fetchCategories = async () => {
-    try {
-      const {
-        data: { categories },
-      } = await categoriesApi.fetch();
-      setCategories(categories);
-      setFilteredCategories(categories);
-    } catch (error) {
-      logger.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   const handleAddCategory = async () => {
     try {
       await categoriesApi.create({ name: categoryName });
       setIsModalOpen(false);
       setCategoryName("");
-      fetchCategories();
     } catch (error) {
       logger.error(error);
     }
