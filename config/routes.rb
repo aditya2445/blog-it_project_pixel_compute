@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   resources :posts, only: %i[index create show], param: :slug
   resources :categories, only: %i[index create]
+  resources :users, only: %i[index, create]
+  resources :organizations, only: :index
 
   root "home#index"
   get "*path", to: "home#index", via: :all
