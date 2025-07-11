@@ -24,7 +24,8 @@ class PostsController < ApplicationController
 
   def show
     post = Post.find_by!(slug: params[:slug])
-    render_json({ post: post })
+    user = User.find(post.user_id)
+    render_json({ post: post, user: user, categories: post.categories })
   end
 
   private

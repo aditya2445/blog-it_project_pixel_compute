@@ -5,10 +5,14 @@ import { PageLoader, PageTitle, Container, Button } from "components/commons";
 import List from "components/Posts/List";
 import Logger from "js-logger";
 import { isNil, isEmpty, either } from "ramda";
+import useCategoryStore from "stores/categoryStore";
+// import { element } from "prop-types";
 
 const Dashboard = ({ history }) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { selectedCategories } = useCategoryStore();
+
   const fetchPosts = async () => {
     try {
       const {
@@ -55,6 +59,30 @@ const Dashboard = ({ history }) => {
     );
   }
 
+  const allPosts = posts.map(parentElement =>
+    parentElement.categories.map(element => element.name)
+  );
+
+  const filterPosts = allPosts.map(element => {
+    const arr = element;
+    let flag = false;
+    arr.forEach(cate => {
+      if (selectedCategories.includes(cate)) flag = true;
+    });
+
+    return flag;
+  });
+
+  const appendIncludeFlag = posts.map((post, idx) => {
+    post.include = filterPosts[idx];
+
+    return post;
+  });
+
+  const filteredPosts = isEmpty(selectedCategories)
+    ? posts
+    : appendIncludeFlag.filter(ele => ele.include);
+
   return (
     <Container className="h-screen w-full">
       <div className="flex flex-col gap-y-8 overflow-y-auto">
@@ -66,7 +94,7 @@ const Dashboard = ({ history }) => {
             onClick={clickHandler}
           />
         </div>
-        <List postList={posts} showPost={showPost} />
+        <List postList={filteredPosts} showPost={showPost} />
       </div>
     </Container>
   );
