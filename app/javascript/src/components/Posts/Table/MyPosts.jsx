@@ -1,55 +1,30 @@
-// components/Posts/MyPosts.jsx
+import React from "react";
 
-import React, { useEffect, useState } from "react";
-
-import postsApi from "apis/posts";
 import { PageTitle, PageLoader, Container } from "components/commons";
-import { toast } from "react-toastify";
+import {
+  useShowMyPosts,
+  useDeletePost,
+  useTogglePostStatus,
+} from "hooks/usePostsApi";
 
 import PostTable from "./PostTable";
 
 const MyPosts = () => {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useShowMyPosts();
+  const { mutate: deletePost } = useDeletePost();
+  const { mutate: toggleStatus } = useTogglePostStatus();
 
-  const fetchMyPosts = async () => {
-    try {
-      const response = await postsApi.myPosts();
-      setPosts(response.data.posts);
-    } catch (error) {
-      logger.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const posts = data?.data?.posts;
+
+  const handleDelete = slug => {
+    deletePost(slug);
   };
 
-  const handleDelete = async slug => {
-    try {
-      await postsApi.destroy(slug);
-      toast.success("Post deleted");
-      fetchMyPosts(); // refresh
-    } catch (error) {
-      logger.error(error);
-    }
+  const handleToggleStatus = slug => {
+    toggleStatus(slug);
   };
 
-  const handleToggleStatus = async (slug, newStatus) => {
-    try {
-      await postsApi.toggleStatus(slug);
-      toast.success(
-        `Post ${newStatus === "draft" ? "unpublished" : "published"}`
-      );
-      fetchMyPosts(); // refresh
-    } catch (error) {
-      logger.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchMyPosts();
-  }, []);
-
-  if (loading) return <PageLoader />;
+  if (isLoading) return <PageLoader />;
 
   return (
     <Container>

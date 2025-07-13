@@ -1,15 +1,16 @@
-// components/Posts/PostTable.jsx
-
 import React from "react";
 
 import { MenuHorizontal } from "@bigbinary/neeto-icons";
-import { Dropdown, Tooltip } from "@bigbinary/neetoui";
+import { Dropdown, Tooltip, Typography } from "@bigbinary/neetoui";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
 const PostTable = ({ posts, onToggleStatus, onDelete }) => (
-  <div className="overflow-x-auto rounded border border-gray-300">
+  <div className="overflow-x-auto rounded">
+    <div className="mb-2 mt-4">
+      <Typography weight="bold">{posts.length} articles</Typography>
+    </div>
     <table className="min-w-full table-fixed">
       <thead>
         <tr className="bg-gray-100 text-xs uppercase text-gray-800">
@@ -21,15 +22,19 @@ const PostTable = ({ posts, onToggleStatus, onDelete }) => (
         </tr>
       </thead>
       <tbody>
-        {posts.map(post => {
-          const isDraft = post.status === "draft";
+        {posts.map((post, index) => {
+          const isDraft = post?.status === "draft";
           const dropdownOptions = isDraft
             ? ["Publish", "Delete"]
             : ["Unpublish", "Delete"];
 
           return (
-            <tr className="border-t" key={post.id}>
-              {/* Title with tooltip + ellipsis */}
+            <tr
+              key={post.id}
+              className={`${
+                index % 2 === 0 ? "bg-white" : "bg-slate-300"
+              } border-t`}
+            >
               <td className="max-w-xs truncate px-4 py-2 font-medium text-indigo-600">
                 <Tooltip tooltipContent={post.title}>
                   <Link
@@ -40,22 +45,18 @@ const PostTable = ({ posts, onToggleStatus, onDelete }) => (
                   </Link>
                 </Tooltip>
               </td>
-              {/* Categories */}
               <td
                 className="p
               x-4 py-2 text-sm text-gray-800"
               >
                 {post.categories.map(c => c.name).join(", ")}
               </td>
-              {/* Last published at */}
               <td className="px-4 py-2 text-sm text-gray-700">
-                {post.published_at
-                  ? dayjs(post.published_at).format("DD MMM YYYY, hh:mm A")
+                {post.updated_at
+                  ? dayjs(post.updated_at).format("DD MMM YYYY, hh:mm A")
                   : "—"}
               </td>
-              {/* Status */}
               <td className="px-4 py-2 text-sm capitalize">{post.status}</td>
-              {/* Dropdown actions */}
               <td className="px-4 py-2 text-center">
                 <Dropdown
                   buttonStyle="text"
@@ -68,14 +69,14 @@ const PostTable = ({ posts, onToggleStatus, onDelete }) => (
                   <Dropdown.Menu>
                     {dropdownOptions.includes("Publish") && (
                       <Dropdown.MenuItem.Button
-                        onClick={() => onToggleStatus(post.slug, "published")}
+                        onClick={() => onToggleStatus(post.slug)}
                       >
                         Publish
                       </Dropdown.MenuItem.Button>
                     )}
                     {dropdownOptions.includes("Unpublish") && (
                       <Dropdown.MenuItem.Button
-                        onClick={() => onToggleStatus(post.slug, "draft")}
+                        onClick={() => onToggleStatus(post.slug)}
                       >
                         Unpublish
                       </Dropdown.MenuItem.Button>

@@ -2,7 +2,9 @@
 
 class PostsController < ApplicationController
   def index
-    posts = Post.includes(:user, :organization, :categories).where(organization_id: current_user.organization_id)
+    posts = Post.includes(:user, :organization, :categories).where(
+      organization_id: current_user.organization_id,
+      status: "published")
     render status: :ok, json: {
       posts: posts.as_json(
         include: {

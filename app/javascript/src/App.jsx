@@ -27,7 +27,7 @@ const App = () => {
           <Route exact component={ShowPost} path="/posts/:slug/show" />
           <Route exact component={Signup} path="/signup" />
           <Route exact component={Login} path="/login" />
-          <Route exact component={MyPosts} path="/posts/my_posts" />
+          <Route exact component={MyPosts} path="/my_posts" />
           <PrivateRoute
             component={Dashboard}
             condition={isLoggedIn}

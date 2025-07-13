@@ -14,7 +14,15 @@ const update = (slug, payload) =>
     post: payload,
   });
 const myPosts = () => axios.get("/posts/my_posts");
-
-const postsApi = { fetch, create, show, destroy, update, myPosts };
+const toggleStatus = slug => axios.patch(`posts/${slug}/toggle_status`);
+const postsApi = {
+  fetch,
+  create,
+  show,
+  destroy,
+  update,
+  myPosts,
+  toggleStatus,
+};
 
 export default postsApi;

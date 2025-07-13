@@ -1,16 +1,16 @@
 import React, { useRef } from "react";
 
+import { Edit, Folder, List, ListDetails } from "@bigbinary/neeto-icons";
 import { Popover } from "@bigbinary/neetoui";
 import authApi from "apis/auth";
 import { resetAuthTokens } from "apis/axios";
 import { Button } from "components/commons";
-import { useHistory } from "react-router-dom";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { getFromLocalStorage, setToLocalStorage } from "utils/storage";
 
 const NavBar = ({ setShow }) => {
   const userName = getFromLocalStorage("authUserName");
   const loggedUserImageReference = useRef(null);
-  const history = useHistory();
 
   const handleLogout = async () => {
     try {
@@ -29,25 +29,54 @@ const NavBar = ({ setShow }) => {
   };
 
   return (
-    <div className="flex h-screen w-20 flex-col items-center justify-between border-r-2 p-4 ">
-      <div className="flex flex-col gap-2">
-        <Button buttonText="Blogs" className="bg-slate-600" />
-        <Button buttonText="Add Blog" className="bg-slate-600" />
-        <Button
-          buttonText="Show Cats"
-          className="bg-slate-600"
-          onClick={() => setShow(prev => !prev)}
-        />
-        <Button
-          buttonText="My posts"
-          className="bg-slate-600"
-          onClick={() => history.push("/posts/my_posts")}
-        />
+    <div className="flex h-screen w-12 flex-col items-center justify-between border-r-2 p-4 ">
+      <div className="flex flex-col items-center gap-2">
+        <Link to="/">
+          <div className="h-6 w-6 cursor-pointer">
+            <img src="https://img.icons8.com/?size=100&id=tz1GQBtNqT2P&format=png&color=000000" />
+          </div>
+        </Link>
+        <Link
+          className={`${window.location.pathname === "/" && "text-blue-900"}`}
+          to="/"
+        >
+          <div className="h-6 w-6 cursor-pointer py-6">
+            <List />
+          </div>
+        </Link>
+        <Link
+          to="/post/create"
+          className={`${
+            window.location.pathname === "/post/create" && "text-blue-900"
+          }`}
+        >
+          <div className="h-6 w-6 cursor-pointer py-6">
+            <Edit />
+          </div>
+        </Link>
+        {window.location.pathname === "/" && (
+          <div
+            className="h-6 w-6 cursor-pointer py-6"
+            onClick={() => setShow(prev => !prev)}
+          >
+            <ListDetails />
+          </div>
+        )}
+        <Link
+          to="/my_posts"
+          className={`${
+            window.location.pathname === "/post/create" && "text-blue-900"
+          }`}
+        >
+          <div className="h-6 w-6 cursor-pointer py-6">
+            <Folder />
+          </div>
+        </Link>
       </div>
-      <div className="relative">
+      <div className="relative h-10 w-10 items-center justify-center">
         <img
           alt="profile"
-          className="h-10 w-10 rounded-full border "
+          className="h-8 w-8 rounded-full border "
           ref={loggedUserImageReference}
           src="https://static.vecteezy.com/system/resources/thumbnails/022/014/184/small/user-icon-member-login-isolated-vector.jpg"
         />

@@ -3,14 +3,16 @@ import React, { useState } from "react";
 import { MenuHorizontal } from "@bigbinary/neeto-icons";
 import { ActionDropdown, Button } from "@bigbinary/neetoui";
 import { Container, PageTitle } from "components/commons";
-import { useCreatePost } from "hooks/usePostsApi";
+import { useCreatePost, useDeletePost } from "hooks/usePostsApi";
 import { useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom/cjs/react-router-dom";
 import { getFromLocalStorage } from "utils/storage";
 
 import Form from "./Form";
 
 const Create = () => {
   const history = useHistory();
+  const { slug } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
@@ -20,6 +22,7 @@ const Create = () => {
   const { mutate } = useCreatePost();
   const [status, setStatus] = useState("draft");
   const { Menu, MenuItem } = ActionDropdown;
+  const { mutate: deletePost } = useDeletePost();
 
   const handleSubmit = async event => {
     event.preventDefault();
@@ -46,7 +49,7 @@ const Create = () => {
   };
 
   const deleteHandler = () => {
-    alert("we will delete this soon");
+    deletePost(slug);
   };
 
   return (
