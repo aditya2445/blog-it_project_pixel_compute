@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import { MenuHorizontal } from "@bigbinary/neeto-icons";
+import { ActionDropdown, Button } from "@bigbinary/neetoui";
 import { Container, PageTitle } from "components/commons";
 import { useCreatePost } from "hooks/usePostsApi";
 import { useHistory } from "react-router-dom";
@@ -14,8 +16,10 @@ const Create = () => {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const authUserId = getFromLocalStorage("authUserId");
-
+  const [show, setShow] = useState(false);
   const { mutate } = useCreatePost();
+  const [status, setStatus] = useState("draft");
+  const { Menu, MenuItem } = ActionDropdown;
 
   const handleSubmit = async event => {
     event.preventDefault();
@@ -26,11 +30,12 @@ const Create = () => {
         description,
         category_ids: selectedCategoryIds,
         user_id: authUserId,
+        status,
       },
       {
         onSuccess: () => {
           setLoading(false);
-          history.push("/dashboard");
+          history.push("/");
         },
         onError: error => {
           setLoading(false);
@@ -40,10 +45,52 @@ const Create = () => {
     );
   };
 
+  const deleteHandler = () => {
+    alert("we will delete this soon");
+  };
+
   return (
     <Container>
       <div className="flex h-full flex-col gap-4">
-        <PageTitle title="Add new blog" />
+        <div className="flex items-center justify-between">
+          <PageTitle title="Add new blog" />
+          <div className="flex items-center gap-2">
+            <Button
+              label="Cancel"
+              style="secondary"
+              onClick={() => history.back()}
+            />
+            <ActionDropdown
+              buttonStyle="primary"
+              className="z-50"
+              label={status === "draft" ? "Draft" : "Publish"}
+            >
+              <Menu>
+                <MenuItem.Button onClick={() => setStatus("published")}>
+                  Publish
+                </MenuItem.Button>
+                <MenuItem.Button onClick={() => setStatus("draft")}>
+                  Save as draft
+                </MenuItem.Button>
+              </Menu>
+            </ActionDropdown>
+            <div className="relative">
+              <MenuHorizontal
+                className="cursor-pointer"
+                onClick={() => setShow(prev => !prev)}
+              />
+              {show && (
+                <Button
+                  className="absolute right-0 top-9 text-red-600"
+                  style="secondary"
+                  onClick={deleteHandler}
+                >
+                  Delete
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
         <Form
           description={description}
           handleSubmit={handleSubmit}

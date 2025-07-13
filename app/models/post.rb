@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Post < ApplicationRecord
+  enum :status, { draft: 0, published: 1 }
   has_and_belongs_to_many :categories
   belongs_to :organization
   belongs_to :user
@@ -11,6 +12,7 @@ class Post < ApplicationRecord
   validate :slug_not_changed
 
   before_create :set_slug
+  before_save :set_published_at, if: :publishing_now?
 
   private
 
@@ -35,5 +37,13 @@ class Post < ApplicationRecord
       if will_save_change_to_slug? && self.persisted?
         errors.add(:slug, I18n.t("is immutable!"))
       end
+    end
+
+    def publishing_now?
+      published? && published_at.blank?
+    end
+
+    def set_published_at
+      self.published_at = Time.current
     end
 end

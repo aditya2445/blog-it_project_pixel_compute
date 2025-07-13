@@ -5,6 +5,7 @@ import { Button, Input } from "components/commons";
 import Select from "react-select";
 
 const Form = ({
+  type = "Create",
   title,
   setTitle,
   description,
@@ -84,10 +85,15 @@ const Form = ({
         <div className="mt-4 flex items-center gap-4 self-end">
           <Button
             buttonText="Cancel"
+            className={`${type === "Create" ? "block" : "hidden"}`}
             style="secondary"
             onClick={() => history.back()}
           />
-          <Button buttonText="Submit" loading={loading} type="submit" />
+          <Button
+            buttonText={`${type === "Create" ? "Submit" : "Edit"}`}
+            loading={loading}
+            type="submit"
+          />
         </div>
       </div>
     </form>

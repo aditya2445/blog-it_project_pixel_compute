@@ -48,6 +48,7 @@ gem "bootsnap", require: false
 gem "ostruct"
 gem "pp"
 gem "prettyprint"
+gem "pundit"
 gem "react-rails", "~> 2.7.1"
 
 group :development, :test do

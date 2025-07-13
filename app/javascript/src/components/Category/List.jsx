@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import { Search, Plus } from "@bigbinary/neeto-icons";
 import { Typography, Input, Button, Modal } from "@bigbinary/neetoui";
-import categoriesApi from "apis/categories";
 import classNames from "classnames";
-import { useFetchCategories } from "hooks/useCategoryApi";
+import { useFetchCategories, useCreateCategory } from "hooks/useCategoryApi";
 import { isEmpty } from "ramda";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import useCategoryStore from "stores/categoryStore";
@@ -17,6 +16,7 @@ const List = ({ show }) => {
   const [searchInput, setSearchInput] = useState("");
   const { selectedCategories, toggleCategory } = useCategoryStore();
   const { data, isLoading } = useFetchCategories();
+  const { mutate } = useCreateCategory();
   const categories = data?.data?.categories;
 
   useEffect(() => {
@@ -29,14 +29,21 @@ const List = ({ show }) => {
     toggleCategory(category.name);
   };
 
-  const handleAddCategory = async () => {
-    try {
-      await categoriesApi.create({ name: categoryName });
-      setIsModalOpen(false);
-      setCategoryName("");
-    } catch (error) {
-      logger.error(error);
-    }
+  const handleAddCategory = async event => {
+    event.preventDefault();
+    mutate(
+      {
+        name: categoryName,
+      },
+      {
+        onSuccess: () => {
+          history.push("/");
+        },
+        onError: error => {
+          logger.error(error);
+        },
+      }
+    );
   };
 
   const handleOnChange = event => {

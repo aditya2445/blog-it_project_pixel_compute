@@ -4,11 +4,14 @@ import { Popover } from "@bigbinary/neetoui";
 import authApi from "apis/auth";
 import { resetAuthTokens } from "apis/axios";
 import { Button } from "components/commons";
+import { useHistory } from "react-router-dom";
 import { getFromLocalStorage, setToLocalStorage } from "utils/storage";
 
 const NavBar = ({ setShow }) => {
   const userName = getFromLocalStorage("authUserName");
   const loggedUserImageReference = useRef(null);
+  const history = useHistory();
+
   const handleLogout = async () => {
     try {
       await authApi.logout();
@@ -35,6 +38,11 @@ const NavBar = ({ setShow }) => {
           className="bg-slate-600"
           onClick={() => setShow(prev => !prev)}
         />
+        <Button
+          buttonText="My posts"
+          className="bg-slate-600"
+          onClick={() => history.push("/posts/my_posts")}
+        />
       </div>
       <div className="relative">
         <img
@@ -54,7 +62,7 @@ const NavBar = ({ setShow }) => {
             </div>
             <Button
               buttonText="Logout"
-              className="cursor-pointer. bg-white text-sm text-black hover:text-white"
+              className="cursor-pointer bg-black text-sm hover:text-white"
               onClick={handleLogout}
             />
           </div>

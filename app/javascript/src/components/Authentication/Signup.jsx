@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import authApi from "apis/auth";
-import organizationsApi from "apis/organization";
 import SignupForm from "components/Authentication/Form/Signup";
+import { useFetchOrganizations } from "hooks/useOrganizationApi";
 
 const Signup = ({ history }) => {
   const [name, setName] = useState("");
@@ -10,21 +10,11 @@ const Signup = ({ history }) => {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [loading, setLoading] = useState(false);
-  const [organizations, setOrganizations] = useState([]);
   const [selectedOrganization, setSelectedOrganization] = useState(null);
 
-  const fetchOrganisations = async () => {
-    try {
-      const { data } = await organizationsApi.fetch();
-      setOrganizations(data.organizations);
-    } catch (error) {
-      logger.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchOrganisations();
-  }, []);
+  const { data, isLoading } = useFetchOrganizations();
+  if (isLoading) return <> </>;
+  const organizations = data?.data?.organizations;
 
   const handleSubmit = async event => {
     event.preventDefault();

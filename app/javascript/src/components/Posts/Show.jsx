@@ -1,19 +1,21 @@
 import React from "react";
 
-import { Typography } from "@bigbinary/neetoui";
+import { Edit } from "@bigbinary/neeto-icons";
+import { Tooltip, Typography } from "@bigbinary/neetoui";
 import { Container, PageLoader, PageTitle } from "components/commons";
 import Categories from "components/commons/Categories";
 import { useFetchPostBySlug } from "hooks/usePostsApi";
 import { useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
 const Show = () => {
   const { slug } = useParams();
+  const history = useHistory();
   const { data, isLoading } = useFetchPostBySlug(slug);
   if (isLoading) {
     return <PageLoader />;
   }
   const { post, user, categories } = data.data;
-
   const isoDate = post.created_at;
   const date = new Date(isoDate);
 
@@ -28,7 +30,22 @@ const Show = () => {
       <div className="flex flex-col p-4">
         <div className="flex flex-col">
           <Categories categories={categories} />
-          <PageTitle title={post?.title} />
+          <div className="flex justify-between">
+            <div className="flex items-center justify-center">
+              <PageTitle title={post?.title} />
+              {post?.status === "draft" && (
+                <span className="text-Red-800 ml-2 mt-8 rounded-xl border border-red-600 px-2 py-1 text-xs font-semibold text-red-700">
+                  Draft
+                </span>
+              )}
+            </div>
+            <Tooltip content="Edit" followCursor="horizontal" position="top">
+              <Edit
+                className="cursor-pointer"
+                onClick={() => history.push(`/posts/${slug}/edit`)}
+              />
+            </Tooltip>
+          </div>
           <div className="mb-4 flex items-center gap-2">
             <div>
               <img

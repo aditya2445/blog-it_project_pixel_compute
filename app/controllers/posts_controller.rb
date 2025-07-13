@@ -29,9 +29,43 @@ class PostsController < ApplicationController
     render_json({ post: post, user: user, categories: post.categories })
   end
 
+  def update
+    post = Post.find_by(slug: params[:slug])
+    post.update!(post_params)
+    render_notice("Post successfully updated")
+  end
+
+  def destroy
+    post = Post.find_by!(slug: params[:slug])
+    post.destroy!
+    render_notice("Post deleted successfully")
+  end
+
+  def toggle_status
+    post = Post.find_by(slug: params[:slug])
+    if post.draft?
+      post.update!(status: :published, published_at: Time.current)
+    else
+      post.update!(status: :draft)
+    end
+    render_notice("Post status updated")
+  end
+
+  def my_posts
+    posts = current_user.posts.includes(:categories)
+    render status: :ok, json: {
+      posts: posts.as_json(
+        only: [:id, :title, :status, :slug, :published_at],
+        include: {
+          categories: { only: [:id, :name] }
+        }
+      )
+    }
+  end
+
   private
 
     def post_params
-      params.require(:post).permit(:title, :description, :user_id, category_ids: [])
+      params.require(:post).permit(:title, :description, :status, :user_id, category_ids: [])
     end
 end
