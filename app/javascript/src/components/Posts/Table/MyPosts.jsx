@@ -4,7 +4,7 @@ import { PageTitle, PageLoader, Container } from "components/commons";
 import {
   useShowMyPosts,
   useDeletePost,
-  useTogglePostStatus,
+  useUpdatePost,
 } from "hooks/usePostsApi";
 
 import PostTable from "./PostTable";
@@ -12,19 +12,21 @@ import PostTable from "./PostTable";
 const MyPosts = () => {
   const { data, isLoading } = useShowMyPosts();
   const { mutate: deletePost } = useDeletePost();
-  const { mutate: toggleStatus } = useTogglePostStatus();
-
-  const posts = data?.data?.posts;
-
+  const { mutate: updatePost } = useUpdatePost();
+  if (isLoading) return <PageLoader />;
   const handleDelete = slug => {
     deletePost(slug);
   };
 
-  const handleToggleStatus = slug => {
-    toggleStatus(slug);
+  const handleOnToggleStatus = (slug, status) => {
+    updatePost({
+      slug,
+      payload: {
+        status,
+      },
+    });
   };
-
-  if (isLoading) return <PageLoader />;
+  const posts = data?.data?.posts;
 
   return (
     <Container>
@@ -32,7 +34,7 @@ const MyPosts = () => {
       <PostTable
         posts={posts}
         onDelete={handleDelete}
-        onToggleStatus={handleToggleStatus}
+        onToggleStatus={handleOnToggleStatus}
       />
     </Container>
   );

@@ -1,28 +1,23 @@
 import React, { useState } from "react";
 
-import { MenuHorizontal } from "@bigbinary/neeto-icons";
 import { ActionDropdown, Button } from "@bigbinary/neetoui";
 import { Container, PageTitle } from "components/commons";
-import { useCreatePost, useDeletePost } from "hooks/usePostsApi";
+import { useCreatePost } from "hooks/usePostsApi";
 import { useHistory } from "react-router-dom";
-import { useParams } from "react-router-dom/cjs/react-router-dom";
 import { getFromLocalStorage } from "utils/storage";
 
 import Form from "./Form";
 
 const Create = () => {
   const history = useHistory();
-  const { slug } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const authUserId = getFromLocalStorage("authUserId");
-  const [show, setShow] = useState(false);
   const { mutate } = useCreatePost();
   const [status, setStatus] = useState("draft");
   const { Menu, MenuItem } = ActionDropdown;
-  const { mutate: deletePost } = useDeletePost();
 
   const handleSubmit = async event => {
     event.preventDefault();
@@ -46,10 +41,6 @@ const Create = () => {
         },
       }
     );
-  };
-
-  const deleteHandler = () => {
-    deletePost(slug);
   };
 
   return (
@@ -77,21 +68,6 @@ const Create = () => {
                 </MenuItem.Button>
               </Menu>
             </ActionDropdown>
-            <div className="relative">
-              <MenuHorizontal
-                className="cursor-pointer"
-                onClick={() => setShow(prev => !prev)}
-              />
-              {show && (
-                <Button
-                  className="absolute right-0 top-9 text-red-600"
-                  style="secondary"
-                  onClick={deleteHandler}
-                >
-                  Delete
-                </Button>
-              )}
-            </div>
           </div>
         </div>
         <Form

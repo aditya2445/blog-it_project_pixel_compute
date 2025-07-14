@@ -43,21 +43,11 @@ class PostsController < ApplicationController
     render_notice("Post deleted successfully")
   end
 
-  def toggle_status
-    post = Post.find_by(slug: params[:slug])
-    if post.draft?
-      post.update!(status: :published, published_at: Time.current)
-    else
-      post.update!(status: :draft)
-    end
-    render_notice("Post status updated")
-  end
-
   def my_posts
     posts = current_user.posts.includes(:categories)
     render status: :ok, json: {
       posts: posts.as_json(
-        only: [:id, :title, :status, :slug, :published_at],
+        only: [:id, :title, :status, :slug, :created_at, :updated_at],
         include: {
           categories: { only: [:id, :name] }
         }

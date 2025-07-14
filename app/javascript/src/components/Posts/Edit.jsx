@@ -1,128 +1,13 @@
-// import React, { useEffect, useState } from "react";
-
-// import { MenuHorizontal } from "@bigbinary/neeto-icons";
-// import { Dropdown, Button } from "@bigbinary/neetoui";
-// import { Container, PageTitle, PageLoader } from "components/commons";
-// import { useCreatePost, useFetchPostBySlug } from "hooks/usePostsApi";
-// import { useParams } from "react-router-dom";
-// import { getFromLocalStorage } from "utils/storage";
-
-// import Form from "./Form";
-
-// const Edit = () => {
-//   const { slug } = useParams();
-//   const [title, setTitle] = useState("");
-//   const [description, setDescription] = useState("");
-//   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
-//   const [loading, setLoading] = useState(false);
-//   const authUserId = getFromLocalStorage("authUserId");
-//   const { Menu, MenuItem } = Dropdown;
-//   const { mutate } = useCreatePost();
-//   const [show, setShow] = useState(false);
-
-//   const { data, isLoading } = useFetchPostBySlug(slug);
-
-//   useEffect(() => {
-//     if (data) {
-//       const { post, categories } = data.data;
-//       setTitle(post.title);
-//       setDescription(post.description);
-//       setSelectedCategoryIds(categories.map(cat => cat.id));
-//     }
-//   }, [data]);
-
-//   const handleSubmit = async event => {
-//     event.preventDefault();
-//     setLoading(true);
-//     mutate(
-//       {
-//         title,
-//         description,
-//         category_ids: selectedCategoryIds,
-//         user_id: authUserId,
-//       },
-//       {
-//         onSuccess: () => {
-//           setLoading(false);
-//           // history.push("/dashboard");
-//         },
-//         onError: error => {
-//           setLoading(false);
-//           logger.error(error);
-//         },
-//       }
-//     );
-//   };
-
-//   const deleteHandler = () => {
-//     alert("we will soon delete the post");
-//     setShow(false);
-//   };
-
-//   return (
-//     <Container>
-//       <div className="flex h-full flex-col gap-4">
-//         <div className="flex items-center justify-between">
-//           <PageTitle title="Edit blog post" />
-//           <div className="flex items-center gap-2">
-//             <Button
-//               label="Cancel"
-//               style="secondary"
-//               onClick={() => history.back()}
-//             />
-//             <Dropdown buttonStyle="primary" className="z-50" label="Publish">
-//               <Menu>
-//                 <MenuItem.Button onClick={() => alert("Published as draft")}>
-//                   Publish
-//                 </MenuItem.Button>
-//                 <MenuItem.Button
-//                   onClick={() => alert("Published successfully")}
-//                 >
-//                   Save as draft
-//                 </MenuItem.Button>
-//               </Menu>
-//             </Dropdown>
-//             <div className="relative">
-//               <MenuHorizontal
-//                 className="cursor-pointer"
-//                 onClick={() => setShow(prev => !prev)}
-//               />
-//               {show && (
-//                 <Button
-//                   className="absolute right-0 top-9 text-red-600"
-//                   style="secondary"
-//                   onClick={deleteHandler}
-//                 >
-//                   Delete
-//                 </Button>
-//               )}
-//             </div>
-//           </div>
-//         </div>
-//         <Form
-//           description={description}
-//           handleSubmit={handleSubmit}
-//           loading={loading}
-//           selectedCategoryIds={selectedCategoryIds}
-//           setDescription={setDescription}
-//           setSelectedCategoryIds={setSelectedCategoryIds}
-//           setTitle={setTitle}
-//           title={title}
-//         />
-//       </div>
-//     </Container>
-//   );
-// };
-
-// export default Edit;
-
 import React, { useEffect, useState } from "react";
 
 import { ExternalLink, MenuHorizontal } from "@bigbinary/neeto-icons";
-import { Dropdown, Button } from "@bigbinary/neetoui";
-import postsApi from "apis/posts";
+import { Button, ActionDropdown } from "@bigbinary/neetoui";
 import { Container, PageTitle, PageLoader } from "components/commons";
-import { useUpdatePost, useFetchPostBySlug } from "hooks/usePostsApi";
+import {
+  useUpdatePost,
+  useFetchPostBySlug,
+  useDeletePost,
+} from "hooks/usePostsApi";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
@@ -137,10 +22,13 @@ const Edit = () => {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [status, setStatus] = useState("");
+  const [publishedTime, setPublishedTime] = useState("");
+  const [statusToShow, setStatusToShow] = useState("");
 
-  const { Menu, MenuItem } = Dropdown;
+  const { Menu, MenuItem } = ActionDropdown;
   const { mutate } = useUpdatePost();
   const history = useHistory();
+  const { mutate: deletePost } = useDeletePost();
 
   const { data, isLoading } = useFetchPostBySlug(slug);
 
@@ -151,13 +39,14 @@ const Edit = () => {
       setDescription(post.description);
       setSelectedCategoryIds(categories.map(cat => cat.id));
       setStatus(post.status);
+      setStatusToShow(post.status);
+      setPublishedTime(post.published_at);
     }
   }, [data]);
 
   const handleSubmit = event => {
     event.preventDefault();
     setLoading(true);
-
     mutate(
       {
         slug,
@@ -165,6 +54,7 @@ const Edit = () => {
           title,
           description,
           status,
+          category_ids: selectedCategoryIds,
         },
       },
       {
@@ -181,12 +71,8 @@ const Edit = () => {
   };
 
   const deleteHandler = async slug => {
-    try {
-      await postsApi.destroy(slug);
-      history.push("/");
-    } catch (error) {
-      logger.error(error);
-    }
+    deletePost(slug);
+    history.push("/");
   };
 
   if (isLoading) return <PageLoader />;
@@ -197,6 +83,17 @@ const Edit = () => {
         <div className="flex items-center justify-between">
           <PageTitle title="Edit blog post" />
           <div className="flex items-center gap-2">
+            <span>
+              {statusToShow === "published" ? "Published on " : "Drafted at "}
+              {new Date(publishedTime).toLocaleString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
             <ExternalLink
               className="cursor-pointer"
               onClick={() => history.push(`/posts/${slug}/show`)}
@@ -206,20 +103,20 @@ const Edit = () => {
               style="secondary"
               onClick={() => history.push("/")}
             />
-            <Dropdown
+            <ActionDropdown
               buttonStyle="primary"
               className="z-50"
-              label={status === "draft" ? "Daft" : "Published"}
+              label={status === "draft" ? "Draft" : "Publish"}
             >
               <Menu>
-                <MenuItem.Button onClick={() => alert("Published as draft")}>
+                <MenuItem.Button onClick={() => setStatus("published")}>
                   Publish
                 </MenuItem.Button>
-                <MenuItem.Button onClick={() => alert("Saved as draft")}>
+                <MenuItem.Button onClick={() => setStatus("draft")}>
                   Save as draft
                 </MenuItem.Button>
               </Menu>
-            </Dropdown>
+            </ActionDropdown>
             <div className="relative">
               <MenuHorizontal
                 className="cursor-pointer"

@@ -21,7 +21,7 @@ const Card = ({ element: post, showPost }) => {
       </p>
       <Categories categories={post.categories} />
       <div>
-        <p className="font-semibold text-bb-gray-600">{post.user.name}</p>
+        <p className="font-semibold text-bb-gray-600">{post?.user?.name}</p>
         <p className="text-bb-gray-600">{formatted}</p>
       </div>
     </div>

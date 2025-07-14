@@ -7,11 +7,13 @@ import Categories from "components/commons/Categories";
 import { useFetchPostBySlug } from "hooks/usePostsApi";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { getFromLocalStorage } from "utils/storage";
 
 const Show = () => {
   const { slug } = useParams();
   const history = useHistory();
   const { data, isLoading } = useFetchPostBySlug(slug);
+  const authUserId = getFromLocalStorage("authUserId");
   if (isLoading) {
     return <PageLoader />;
   }
@@ -39,12 +41,14 @@ const Show = () => {
                 </span>
               )}
             </div>
-            <Tooltip content="Edit" followCursor="horizontal" position="top">
-              <Edit
-                className="cursor-pointer"
-                onClick={() => history.push(`/posts/${slug}/edit`)}
-              />
-            </Tooltip>
+            {post.user_id === authUserId && (
+              <Tooltip content="Edit" followCursor="horizontal" position="top">
+                <Edit
+                  className="cursor-pointer"
+                  onClick={() => history.push(`/posts/${slug}/edit`)}
+                />
+              </Tooltip>
+            )}
           </div>
           <div className="mb-4 flex items-center gap-2">
             <div>
@@ -63,16 +67,9 @@ const Show = () => {
               </Typography>
             </div>
           </div>
-          <Typography className="leading-2 text-justify" style="body2">
+          <pre className="leading-2 text-justify font-sans">
             {post?.description}
-          </Typography>
-          {/* <div className="leading-2 space-y-4 text-justify">
-            {post?.description?.split("\n").map((para, index) => (
-              <Typography key={index} style="body2">
-                {para}
-              </Typography>
-            ))}
-          </div> */}
+          </pre>
         </div>
       </div>
     </Container>

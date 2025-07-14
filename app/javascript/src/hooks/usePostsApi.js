@@ -11,7 +11,7 @@ export const useShowPosts = () =>
 
 export const useFetchPostBySlug = slug =>
   useQuery({
-    queryKey: [QUERY_KEYS.POSTS, slug],
+    queryKey: [QUERY_KEYS.POST, slug],
     queryFn: () => postsApi.show(slug),
     enabled: !!slug,
   });
@@ -34,6 +34,8 @@ export const useUpdatePost = () => {
     mutationFn: ({ slug, payload }) => postsApi.update(slug, payload),
     onSuccess: ({ slug }) => {
       queryClient.invalidateQueries([QUERY_KEYS.POSTS, slug]);
+      queryClient.invalidateQueries([QUERY_KEYS.MY_POSTS]);
+      queryClient.invalidateQueries([QUERY_KEYS.POST]);
     },
   });
 };
@@ -45,18 +47,8 @@ export const useDeletePost = () => {
     mutationFn: slug => postsApi.destroy(slug),
     onSuccess: () => {
       queryClient.invalidateQueries([QUERY_KEYS.POSTS]);
-    },
-  });
-};
-
-export const useTogglePostStatus = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: slug => postsApi.toggleStatus(slug),
-    onSuccess: () => {
-      queryClient.invalidateQueries([QUERY_KEYS.POSTS]);
       queryClient.invalidateQueries([QUERY_KEYS.MY_POSTS]);
+      queryClient.invalidateQueries([QUERY_KEYS.POST]);
     },
   });
 };

@@ -30,7 +30,7 @@ const NavBar = ({ setShow }) => {
 
   return (
     <div className="flex h-screen w-12 flex-col items-center justify-between border-r-2 p-4 ">
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-7">
         <Link to="/">
           <div className="h-6 w-6 cursor-pointer">
             <img src="https://img.icons8.com/?size=100&id=tz1GQBtNqT2P&format=png&color=000000" />
@@ -40,7 +40,7 @@ const NavBar = ({ setShow }) => {
           className={`${window.location.pathname === "/" && "text-blue-900"}`}
           to="/"
         >
-          <div className="h-6 w-6 cursor-pointer py-6">
+          <div className="h-6 w-6 cursor-pointer">
             <List />
           </div>
         </Link>
@@ -50,13 +50,15 @@ const NavBar = ({ setShow }) => {
             window.location.pathname === "/post/create" && "text-blue-900"
           }`}
         >
-          <div className="h-6 w-6 cursor-pointer py-6">
+          <div className="h-6 w-6 cursor-pointer">
             <Edit />
           </div>
         </Link>
         {window.location.pathname === "/" && (
           <div
-            className="h-6 w-6 cursor-pointer py-6"
+            className={`${
+              window.location.pathname === "/" && "text-blue-900"
+            }h-6 w-6 cursor-pointer`}
             onClick={() => setShow(prev => !prev)}
           >
             <ListDetails />
@@ -65,10 +67,10 @@ const NavBar = ({ setShow }) => {
         <Link
           to="/my_posts"
           className={`${
-            window.location.pathname === "/post/create" && "text-blue-900"
+            window.location.pathname === "/my_posts" && "text-blue-900"
           }`}
         >
-          <div className="h-6 w-6 cursor-pointer py-6">
+          <div className="h-6 w-6 cursor-pointer">
             <Folder />
           </div>
         </Link>

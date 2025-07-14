@@ -69,14 +69,14 @@ const PostTable = ({ posts, onToggleStatus, onDelete }) => (
                   <Dropdown.Menu>
                     {dropdownOptions.includes("Publish") && (
                       <Dropdown.MenuItem.Button
-                        onClick={() => onToggleStatus(post.slug)}
+                        onClick={() => onToggleStatus(post.slug, "published")}
                       >
                         Publish
                       </Dropdown.MenuItem.Button>
                     )}
                     {dropdownOptions.includes("Unpublish") && (
                       <Dropdown.MenuItem.Button
-                        onClick={() => onToggleStatus(post.slug)}
+                        onClick={() => onToggleStatus(post.slug, "draft")}
                       >
                         Unpublish
                       </Dropdown.MenuItem.Button>
